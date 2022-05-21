@@ -31,6 +31,7 @@ Commands:
 **fix**
 
 - methodA is 4x slower than methodB
+- sort bus error if non-numeric
 
 ##Packages (list required packages & run .scripts/python-pip.sh)
 PyTelegramBotAPI
