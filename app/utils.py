@@ -45,7 +45,7 @@ def getCurrLoc(*args):
                 print('Input error...')
                 return
 
-def getFormattedMessage(busStops):
+def getFormattedMessage(busStops, radius):
     def formatNumber(num):
         if num is None:
             return 'No Bus'
@@ -57,13 +57,16 @@ def getFormattedMessage(busStops):
             else:
                 return f'{num} mins'
 
-    s = '<b>Bus Timings:</b>\n'
+    s = f'<b>Bus Timings <i>({len(busStops)} nearby within {radius} km)</i>:</b>\n'
     for busInfo in busStops:
         number, street, _, _, distance = busInfo.values()
         buses = getBusTimingsB(number)['buses']
         s += f'{street}\n({number}): {distance} km\n'
-        for k,v in buses.items():
-            s += f'{k:>7}: Now - {formatNumber(v[0]):>8}, Next - {formatNumber(v[1]):>7}\n'
+        if buses:
+            for k,v in buses.items():
+                s += f'{k:>3}: Now - {formatNumber(v[0]):>7}, Next - {formatNumber(v[1]):>7}\n'
+        else:
+            s += '<i>No available buses</i>\n'
         s += '\n'
     currentTime = ', '.join(pendulum.now('Asia/Singapore').to_day_datetime_string().split(', ')[1:])
     s += f'<i>Updated on: {currentTime}</i>'
@@ -72,10 +75,10 @@ def getFormattedMessage(busStops):
 from extract import getBusTimingsA, getBusTimingsB
 if __name__ == '__main__':
     # Constants
-    setRadius = 0.4 # 0.8 # (km)
-    busLimit = 10
+    setRadius = 0.3 # 0.8 # (km)
+    busLimit = 100
 
     currLoc = getCurrLoc()
     busStops = [i for i in loadBusStops(currLoc) if 'latitude' in i.keys() and getHaversineDistance(*currLoc, i['latitude'], i['longitude']) <= setRadius]
     
-    print(getFormattedMessage(sorted(busStops, key=lambda x: x['distance'])[:busLimit]))
+    print(getFormattedMessage(sorted(busStops, key=lambda x: x['distance'])[:busLimit], setRadius))

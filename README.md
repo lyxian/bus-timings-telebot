@@ -22,7 +22,8 @@ Commands:
 
 **v0**
 
-- run on Telegram
+- run on Telegram (ok)
+- improve message
 
 **v1**
 
@@ -31,7 +32,8 @@ Commands:
 **fix**
 
 - methodA is 4x slower than methodB
-- sort bus error if non-numeric
+- sort bus error if non-numeric (ok)
+- handle no bus data
 
 ##Packages (list required packages & run .scripts/python-pip.sh)
 PyTelegramBotAPI

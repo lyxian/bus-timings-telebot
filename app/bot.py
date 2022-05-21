@@ -19,12 +19,13 @@ def createBot():
     def _message(message):
         bot.delete_message(message.chat.id, message.id)
         if message.location:
-            setRadius = 0.4 # 0.8 # (km)
-            busLimit = 5
+            setRadius = 0.3 # (km)
+            busLimit = 100
             currLoc = getCurrLoc([message.location.latitude, message.location.longitude])
             busStops = [i for i in loadBusStops(currLoc) if 'latitude' in i.keys() and getHaversineDistance(*currLoc, i['latitude'], i['longitude']) <= setRadius]
-            text = getFormattedMessage(sorted(busStops, key=lambda x: x['distance'])[:busLimit])
+            text = getFormattedMessage(sorted(busStops, key=lambda x: x['distance'])[:busLimit], setRadius)
             bot.send_message(message.chat.id, text, parse_mode='HTML')
+            # print(text)
         else:
             bot.send_message(message.chat.id, 'Location not received, please enable correct permissions and try again..')
 
