@@ -45,7 +45,7 @@ def getCurrLoc(*args):
                 print('Input error...')
                 return
 
-def getFormattedMessage(busStops):
+def getFormattedMessage(busStops, radius):
     def formatNumber(num):
         if num is None:
             return 'No Bus'
@@ -57,7 +57,7 @@ def getFormattedMessage(busStops):
             else:
                 return f'{num} mins'
 
-    s = '<b>Bus Timings:</b>\n'
+    s = f'<b>Bus Timings <i>({len(busStops)} nearby within {radius} km)</i>:</b>\n'
     for busInfo in busStops:
         number, street, _, _, distance = busInfo.values()
         buses = getBusTimingsB(number)['buses']
@@ -72,10 +72,10 @@ def getFormattedMessage(busStops):
 from extract import getBusTimingsA, getBusTimingsB
 if __name__ == '__main__':
     # Constants
-    setRadius = 0.4 # 0.8 # (km)
-    busLimit = 10
+    setRadius = 0.3 # 0.8 # (km)
+    busLimit = 100
 
     currLoc = getCurrLoc()
     busStops = [i for i in loadBusStops(currLoc) if 'latitude' in i.keys() and getHaversineDistance(*currLoc, i['latitude'], i['longitude']) <= setRadius]
     
-    print(getFormattedMessage(sorted(busStops, key=lambda x: x['distance'])[:busLimit]))
+    print(getFormattedMessage(sorted(busStops, key=lambda x: x['distance'])[:busLimit], setRadius))
