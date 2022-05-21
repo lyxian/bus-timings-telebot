@@ -14,9 +14,14 @@ def getHaversineDistance(latitude_1, longitude_1, latitude_2, longitude_2):
     return earthDiameter * numpy.arcsin( numpy.sqrt( numpy.sin((latitude_2 - latitude_1) / 2) ** 2 + \
         numpy.cos(latitude_1) * numpy.cos(latitude_2) * numpy.sin((longitude_2 - longitude_1) / 2) ** 2 ) )
 
-def loadBusStops():
+def loadBusStops(currLoc=None):
     with open('busStops.json') as file:
         data = json.load(file)
+    if currLoc:
+        for busStop in data:
+            if 'latitude' in busStop.keys():
+                busLoc = map(float, (busStop['latitude'], busStop['longitude']))
+                busStop['distance'] = getHaversineDistance(*busLoc, *currLoc)
     return data
 
 from typing import List
@@ -39,14 +44,17 @@ def getCurrLoc(*args):
                 print('Input error...')
                 return
 
+from extract import getBusTimingsA, getBusTimingsB
 if __name__ == '__main__':
-    setRadius = 0.8 # (km)
+    setRadius = 0.4 # 0.8 # (km)
     currLoc = getCurrLoc()
-    busStops = [i for i in loadBusStops() if 'latitude' in i.keys() and getHaversineDistance(*currLoc, i['latitude'], i['longitude']) <= setRadius]
-    for busStop in busStops:
+    busStops = [i for i in loadBusStops(currLoc) if 'latitude' in i.keys() and getHaversineDistance(*currLoc, i['latitude'], i['longitude']) <= setRadius]
+    for busStop in sorted(busStops, key=lambda x: x['distance']):
         number = busStop['busStopNo']
         street = busStop['busStopName']
         busLoc = map(float, (busStop['latitude'], busStop['longitude']))
         distance = getHaversineDistance(*currLoc, *busLoc)
         print(f'{street} ({number}): {distance} km')
+        print(getBusTimingsA(number))
+        print('======================================================')
         # break
