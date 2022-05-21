@@ -53,12 +53,18 @@ def getBusTimingsB(busStopNo):
     busUrl = f'https://www.nextbuses.sg/api.php?stop={busStopNo}'
     data = requests.get(busUrl).json()['data']
 
-    return {
-        'title': title,
-        'buses': {
-            k: v['eta'] for k,v in sorted(data.items(), key=lambda x: int(re.sub('[^0-9]', '', x[0])))
+    if data:
+        return {
+            'title': title,
+            'buses': {
+                k: v['eta'] for k,v in sorted(data.items(), key=lambda x: int(re.sub('[^0-9]', '', x[0])))
+            }
         }
-    }
+    else:
+        return {
+            'title': title,
+            'buses': {}
+        }
 
 def extractAllBusStops():
     url = 'https://www.sbstransit.com.sg/service/sbs-transit-app?BusStop`No=67201&ServiceNo='

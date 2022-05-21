@@ -62,8 +62,11 @@ def getFormattedMessage(busStops, radius):
         number, street, _, _, distance = busInfo.values()
         buses = getBusTimingsB(number)['buses']
         s += f'{street}\n({number}): {distance} km\n'
-        for k,v in buses.items():
-            s += f'{k:>7}: Now - {formatNumber(v[0]):>8}, Next - {formatNumber(v[1]):>7}\n'
+        if buses:
+            for k,v in buses.items():
+                s += f'{k:>3}: Now - {formatNumber(v[0]):>7}, Next - {formatNumber(v[1]):>7}\n'
+        else:
+            s += '<i>No available buses</i>\n'
         s += '\n'
     currentTime = ', '.join(pendulum.now('Asia/Singapore').to_day_datetime_string().split(', ')[1:])
     s += f'<i>Updated on: {currentTime}</i>'
