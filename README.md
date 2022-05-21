@@ -19,6 +19,9 @@ Commands:
 - compile bus stops info (ok)
 - get nearest bus stops in proximity (ok)
 - get bus timings (ok)
+
+**v0**
+
 - run on Telegram
 
 **v1**

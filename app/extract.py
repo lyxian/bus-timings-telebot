@@ -45,7 +45,7 @@ def getBusTimingsA(busStopNo):
         # 'buses': dict(zip(*getInfoB(busStops)))
     }
 
-@trackTime
+# @trackTime
 def getBusTimingsB(busStopNo):
     titleUrl = f'https://www.nextbuses.sg/api.php?title={busStopNo}'
     title = requests.get(titleUrl).json()['title']
