@@ -46,15 +46,19 @@ def getCurrLoc(*args):
 
 from extract import getBusTimingsA, getBusTimingsB
 if __name__ == '__main__':
+    # Constants
     setRadius = 0.4 # 0.8 # (km)
+    busLimit = 10
+
     currLoc = getCurrLoc()
     busStops = [i for i in loadBusStops(currLoc) if 'latitude' in i.keys() and getHaversineDistance(*currLoc, i['latitude'], i['longitude']) <= setRadius]
-    for busStop in sorted(busStops, key=lambda x: x['distance']):
+    import time
+    for busStop in sorted(busStops, key=lambda x: x['distance'])[:busLimit]:
         number = busStop['busStopNo']
         street = busStop['busStopName']
         busLoc = map(float, (busStop['latitude'], busStop['longitude']))
         distance = getHaversineDistance(*currLoc, *busLoc)
-        print(f'{street} ({number}): {distance} km')
-        print(getBusTimingsA(number))
+        # print(getBusTimingsA(number))
+        print(getBusTimingsB(number))
         print('======================================================')
         # break

@@ -9,6 +9,16 @@ import os
 #    - <bus_1> : <timing_1> , <timing_2>
 #    - <bus_2> : <timing_1> , <timing_2>
 
+import time
+def trackTime(func):
+    def wrapper(*args):
+        t1 = time.time()
+        rtnVal = func(*args)
+        print(f'Time Taken: {time.time() - t1}')
+        return rtnVal
+    return wrapper
+
+@trackTime
 def getBusTimingsA(busStopNo):
     url = f'https://www.sbstransit.com.sg/service/sbs-transit-app?BusStopNo={busStopNo}&ServiceNo='
     content = requests.get(url).text
@@ -35,6 +45,7 @@ def getBusTimingsA(busStopNo):
         # 'buses': dict(zip(*getInfoB(busStops)))
     }
 
+@trackTime
 def getBusTimingsB(busStopNo):
     titleUrl = f'https://www.nextbuses.sg/api.php?title={busStopNo}'
     title = requests.get(titleUrl).json()['title']
@@ -44,7 +55,7 @@ def getBusTimingsB(busStopNo):
     return {
         'title': title,
         'buses': {
-            k: v['eta'] for k,v in data.items()
+            k: v['eta'] for k,v in sorted(data.items(), key=lambda x: int(x[0]))
         }
     }
 
@@ -99,6 +110,6 @@ def compileBusStopInfo():
 
 if __name__ == '__main__':
     no = 65021 # 67759
-    print(getBusTimingsA(no))
+    # print(getBusTimingsA(no))
     print('===========================')
     print(getBusTimingsB(no))
