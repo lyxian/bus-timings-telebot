@@ -1,5 +1,5 @@
 from cryptography.fernet import Fernet
-from datetime import datetime
+import pendulum
 import numpy
 import json
 import os
@@ -62,7 +62,8 @@ def getFormattedMessage(busStops):
         for k,v in buses.items():
             s += f'{k:>3}: Now - {formatNumber(v[0]):>8}, Next - {formatNumber(v[1])}\n'
         s += '\n'
-    s += f'<i>Updated on: {datetime.now().strftime("%b %d, %Y %-I:%M %p")}</i>'
+    currentTime = ', '.join(pendulum.now('Asia/Singapore').to_day_datetime_string().split(', ')[1:])
+    s += f'<i>Updated on: {currentTime}</i>'
     return s
 
 from extract import getBusTimingsA, getBusTimingsB

@@ -35,6 +35,7 @@ Commands:
 ##Packages (list required packages & run .scripts/python-pip.sh)
 PyTelegramBotAPI
 cryptography
+pendulum
 pyyaml
 flask
 numpy
