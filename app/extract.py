@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import json
 import os
+import re
 
 # Bus Stop Format :
 # - title : <str>
@@ -55,7 +56,7 @@ def getBusTimingsB(busStopNo):
     return {
         'title': title,
         'buses': {
-            k: v['eta'] for k,v in sorted(data.items(), key=lambda x: int(x[0]))
+            k: v['eta'] for k,v in sorted(data.items(), key=lambda x: int(re.sub('[^0-9]', '', x[0])))
         }
     }
 

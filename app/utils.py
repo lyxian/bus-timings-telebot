@@ -47,12 +47,15 @@ def getCurrLoc(*args):
 
 def getFormattedMessage(busStops):
     def formatNumber(num):
-        if num == 0:
-            return 'Arriving'
-        elif num == 1:
-            return f'{num} min'
+        if num is None:
+            return 'No Bus'
         else:
-            return f'{num} mins'
+            if num == 0:
+                return 'Coming'
+            elif num == 1:
+                return f'{num} min'
+            else:
+                return f'{num} mins'
 
     s = '<b>Bus Timings:</b>\n'
     for busInfo in busStops:
@@ -60,7 +63,7 @@ def getFormattedMessage(busStops):
         buses = getBusTimingsB(number)['buses']
         s += f'{street}\n({number}): {distance} km\n'
         for k,v in buses.items():
-            s += f'{k:>3}: Now - {formatNumber(v[0]):>8}, Next - {formatNumber(v[1])}\n'
+            s += f'{k:>7}: Now - {formatNumber(v[0]):>8}, Next - {formatNumber(v[1]):>7}\n'
         s += '\n'
     currentTime = ', '.join(pendulum.now('Asia/Singapore').to_day_datetime_string().split(', ')[1:])
     s += f'<i>Updated on: {currentTime}</i>'
@@ -70,7 +73,7 @@ from extract import getBusTimingsA, getBusTimingsB
 if __name__ == '__main__':
     # Constants
     setRadius = 0.4 # 0.8 # (km)
-    busLimit = 5
+    busLimit = 10
 
     currLoc = getCurrLoc()
     busStops = [i for i in loadBusStops(currLoc) if 'latitude' in i.keys() and getHaversineDistance(*currLoc, i['latitude'], i['longitude']) <= setRadius]
