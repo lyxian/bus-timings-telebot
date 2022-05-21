@@ -59,23 +59,24 @@ def saveJson(JSON):
         json.dump(JSON, file, indent=4)
     print('Saved to busStops.json..')
 
-if os.path.exists('busStops.json'):
-    with open('busStops.json') as file:
-        data = json.load(file)
-else:
-    data = extractAllBusStops()
+if __name__ == '__main__':
+    if os.path.exists('busStops.json'):
+        with open('busStops.json') as file:
+            data = json.load(file)
+    else:
+        data = extractAllBusStops()
 
-for busStop in data:
-    if 'latitude' in busStop.keys():
-        # print(f'Value exists for {busStop["busStopNo"]}')
-        continue
-    try:
-        latitude, longitude = oneMapApi(busStop["busStopNo"])
-    except:
-        print(f'Skipping for {busStop["busStopNo"]}')
-        continue
-    print(f'Bus stop no. {busStop["busStopNo"]}: {latitude}, {longitude}')
-    busStop['latitude'] = latitude
-    busStop['longitude'] = longitude
+    for busStop in data:
+        if 'latitude' in busStop.keys():
+            # print(f'Value exists for {busStop["busStopNo"]}')
+            continue
+        try:
+            latitude, longitude = oneMapApi(busStop["busStopNo"])
+        except:
+            print(f'Skipping for {busStop["busStopNo"]}')
+            continue
+        print(f'Bus stop no. {busStop["busStopNo"]}: {latitude}, {longitude}')
+        busStop['latitude'] = float(latitude)
+        busStop['longitude'] = float(longitude)
 
-saveJson(data)
+    saveJson(data)
