@@ -14,7 +14,7 @@ def trackTime(func):
     def wrapper(*args):
         t1 = time.time()
         rtnVal = func(*args)
-        print(f'Time Taken: {time.time() - t1}')
+        print(f'Time Taken: {time.time() - t1} s')
         return rtnVal
     return wrapper
 
@@ -101,7 +101,7 @@ def compileBusStopInfo():
             latitude, longitude = oneMapApi(busStop["busStopNo"])
         except:
             print(f'Dropping {busStop["busStopNo"]}')
-            busStop.pop('busStopNo')
+            # data.pop('busStopNo')
             continue
         print(f'Bus stop no. {busStop["busStopNo"]}: {latitude}, {longitude}')
         busStop['latitude'] = float(latitude)

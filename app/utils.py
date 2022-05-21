@@ -11,8 +11,8 @@ def getToken():
 def getHaversineDistance(latitude_1, longitude_1, latitude_2, longitude_2):
     latitude_1, longitude_1, latitude_2, longitude_2 = map(numpy.radians, [latitude_1, longitude_1, latitude_2, longitude_2])
     earthDiameter = 2 * 6371.0088 # 6372.8
-    return earthDiameter * numpy.arcsin( numpy.sqrt( numpy.sin((latitude_2 - latitude_1) / 2) ** 2 + \
-        numpy.cos(latitude_1) * numpy.cos(latitude_2) * numpy.sin((longitude_2 - longitude_1) / 2) ** 2 ) )
+    return round(earthDiameter * numpy.arcsin( numpy.sqrt( numpy.sin((latitude_2 - latitude_1) / 2) ** 2 + \
+        numpy.cos(latitude_1) * numpy.cos(latitude_2) * numpy.sin((longitude_2 - longitude_1) / 2) ** 2 ) ), 3)
 
 def loadBusStops(currLoc=None):
     with open('busStops.json') as file:
@@ -52,12 +52,9 @@ if __name__ == '__main__':
 
     currLoc = getCurrLoc()
     busStops = [i for i in loadBusStops(currLoc) if 'latitude' in i.keys() and getHaversineDistance(*currLoc, i['latitude'], i['longitude']) <= setRadius]
-    import time
     for busStop in sorted(busStops, key=lambda x: x['distance'])[:busLimit]:
-        number = busStop['busStopNo']
-        street = busStop['busStopName']
-        busLoc = map(float, (busStop['latitude'], busStop['longitude']))
-        distance = getHaversineDistance(*currLoc, *busLoc)
+        number, street, _, _, distance = busStop.values()
+        print(f'{street} ({number}): {distance} km')
         # print(getBusTimingsA(number))
         print(getBusTimingsB(number))
         print('======================================================')
