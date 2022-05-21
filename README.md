@@ -33,6 +33,7 @@ Commands:
 
 - methodA is 4x slower than methodB
 - sort bus error if non-numeric (ok)
+- handle no bus data
 
 ##Packages (list required packages & run .scripts/python-pip.sh)
 PyTelegramBotAPI
