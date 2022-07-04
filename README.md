@@ -35,6 +35,7 @@ Commands:
   - tasks :
     - nearest bus stops given location
     - plot on map
+    - sendPhoto on Telegram
 
 **fix**
 

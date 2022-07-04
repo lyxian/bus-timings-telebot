@@ -73,12 +73,12 @@ def getFormattedMessage(busStops, radius):
     return s
 
 import requests
-def generateMap(currLoc, busStops):
+def generateMap(currLoc, busStops, urlOnly=False):
     latitude, longitude = currLoc
 
-    pointsString = [f'[{latitude}, {longitude}, "255,255,255"]']
+    pointsString = [f'[{latitude},{longitude},"255,255,255"]']
     for i in range(len(busStops)):
-        pointsString += [f'[{busStops[i]["latitude"]}, {busStops[i]["longitude"]}, "0,0,0", "{chr(ord("A")+i)}"]']
+        pointsString += [f'[{busStops[i]["latitude"]},{busStops[i]["longitude"]},"0,0,0","{chr(ord("A")+i)}"]']
     pointsString = '|'.join(pointsString)
 
     url = 'https://developers.onemap.sg/commonapi/staticmap/getStaticImage'
@@ -92,17 +92,20 @@ def generateMap(currLoc, busStops):
         'height': '500',
         'points': pointsString
     }
-    response = requests.get(url=url, params=params)
-    if response.ok:
-        imagePath = 'map.png'
-        if os.path.exists(imagePath):
-            os.remove(imagePath)
-            print(f'Removed {imagePath}')
-        with open(imagePath, 'wb') as file:
-            file.write(response.content)
-        print(f'Map successfully saved as {imagePath}')
+    if urlOnly:
+        return url + '?' + '&'.join([f'{k}={v}' for k,v in params.items()])
     else:
-        raise Exception('Bad request: Error in parameters')
+        response = requests.get(url=url, params=params)
+        if response.ok:
+            imagePath = 'map.png'
+            if os.path.exists(imagePath):
+                os.remove(imagePath)
+                print(f'Removed {imagePath}')
+            with open(imagePath, 'wb') as file:
+                file.write(response.content)
+            print(f'Map successfully saved as {imagePath}')
+        else:
+            raise Exception('Bad request: Error in parameters')
 
 from extract import getBusTimingsA, getBusTimingsB
 if __name__ == '__main__':

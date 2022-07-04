@@ -15,9 +15,9 @@ busLimit = 100
 currLoc = getCurrLoc()
 busStops = [i for i in loadBusStops(currLoc) if 'latitude' in i.keys() and getHaversineDistance(*currLoc, i['latitude'], i['longitude']) <= setRadius]
 
-pointsString = [f'[{latitude}, {longitude}, "255,255,255"]']
+pointsString = [f'[{latitude},{longitude},"255,255,255"]']
 for i in range(len(busStops)):
-    pointsString += [f'[{busStops[i]["latitude"]}, {busStops[i]["longitude"]}, "0,0,0", "{chr(ord("A")+i)}"]']
+    pointsString += [f'[{busStops[i]["latitude"]},{busStops[i]["longitude"]},"0,0,0","{chr(ord("A")+i)}"]']
 pointsString = '|'.join(pointsString)
 # print(pointsString)
 
@@ -33,7 +33,7 @@ params = {
     'points': pointsString
 }
 
-if 1:
+if 0:
     response = requests.get(url=url, params=params)
 
     if 1:
@@ -46,6 +46,9 @@ if 1:
             os.remove('map.jpg')
         with open('map.jpg', 'wb') as file:
             file.write(response.content)
+else:
+    url = url + '?' + '&'.join([f'{k}={v}' for k,v in params.items()])
+    print(url)
 
 # &layerchosen={Map Layer}
 # &lat={Latitude}
