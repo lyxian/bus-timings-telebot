@@ -29,6 +29,12 @@ Commands:
 **v1**
 
 - show map
+  - API
+    - OneMap
+    - StreetDirectory?
+  - tasks :
+    - nearest bus stops given location
+    - plot on map
 
 **fix**
 
