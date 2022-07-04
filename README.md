@@ -24,6 +24,7 @@ Commands:
 
 - run on Telegram (ok)
 - improve message
+- reverse sorting order
 
 **v1**
 
