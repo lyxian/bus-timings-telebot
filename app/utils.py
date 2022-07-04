@@ -106,6 +106,7 @@ def generateMap(currLoc, busStops, urlOnly=False):
             print(f'Map successfully saved as {imagePath}')
         else:
             raise Exception('Bad request: Error in parameters')
+        return imagePath
 
 from extract import getBusTimingsA, getBusTimingsB
 if __name__ == '__main__':
@@ -119,4 +120,6 @@ if __name__ == '__main__':
     if 0:
         print(getFormattedMessage(sorted(busStops, key=lambda x: x['distance'])[:busLimit], setRadius))
     else:
-        generateMap(currLoc, busStops)
+        imagePath = generateMap(currLoc, busStops)
+        # imagePath = generateMap(currLoc, busStops, urlOnly=True)
+        print(imagePath)

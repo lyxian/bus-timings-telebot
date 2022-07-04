@@ -2,7 +2,7 @@ import telebot
 import logging
 
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
-from utils import getToken, getCurrLoc, loadBusStops, getHaversineDistance, getFormattedMessage
+from utils import getToken, getCurrLoc, loadBusStops, getHaversineDistance, getFormattedMessage, generateMap
 
 def createBot():
     TOKEN = getToken()
@@ -24,7 +24,9 @@ def createBot():
             currLoc = getCurrLoc([message.location.latitude, message.location.longitude])
             busStops = [i for i in loadBusStops(currLoc) if 'latitude' in i.keys() and getHaversineDistance(*currLoc, i['latitude'], i['longitude']) <= setRadius]
             text = getFormattedMessage(sorted(busStops, key=lambda x: x['distance'], reverse=True)[:busLimit], setRadius)
-            bot.send_message(message.chat.id, text, parse_mode='HTML')
+            imagePath = generateMap(currLoc, busStops, urlOnly=True)
+            # bot.send_message(message.chat.id, text, parse_mode='HTML')
+            bot.send_photo(chat_id=message.chat_id, photo=imagePath, caption=text, parse_mode='HTML')
             # print(text)
         else:
             bot.send_message(message.chat.id, 'Location not received, please enable correct permissions and try again..')
