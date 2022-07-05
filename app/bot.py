@@ -1,7 +1,7 @@
 import telebot
 import logging
 
-from telebot.types import ReplyKeyboardMarkup, KeyboardButton
+from telebot.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from utils import getToken, getCurrLoc, loadBusStops, getHaversineDistance, getFormattedMessage, generateMap, removeMapFile
 
 def createBot():
@@ -32,7 +32,7 @@ def createBot():
                 removeMapFile(imagePath)
                 imagePath = imageData
             bot.send_message(message.chat.id, text, parse_mode='HTML')
-            bot.send_photo(chat_id=message.chat.id, photo=imagePath, parse_mode='HTML')
+            bot.send_photo(chat_id=message.chat.id, photo=imagePath, parse_mode='HTML', reply_markup=ReplyKeyboardRemove())
             # print(text)
         else:
             bot.send_message(message.chat.id, 'Location not received, please enable correct permissions and try again..')
