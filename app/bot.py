@@ -2,7 +2,7 @@ import telebot
 import logging
 
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
-from utils import getToken, getCurrLoc, loadBusStops, getHaversineDistance, getFormattedMessage
+from utils import getToken, getCurrLoc, loadBusStops, getHaversineDistance, getFormattedMessage, generateMap, removeMapFile
 
 def createBot():
     TOKEN = getToken()
@@ -21,10 +21,18 @@ def createBot():
         if message.location:
             setRadius = 0.3 # (km)
             busLimit = 100
+            urlOnly = False
             currLoc = getCurrLoc([message.location.latitude, message.location.longitude])
-            busStops = [i for i in loadBusStops(currLoc) if 'latitude' in i.keys() and getHaversineDistance(*currLoc, i['latitude'], i['longitude']) <= setRadius]
-            text = getFormattedMessage(sorted(busStops, key=lambda x: x['distance'], reverse=True)[:busLimit], setRadius)
+            busStops = sorted([i for i in loadBusStops(currLoc) if 'latitude' in i.keys() and getHaversineDistance(*currLoc, i['latitude'], i['longitude']) <= setRadius], key=lambda x: x['distance'], reverse=True)[:busLimit]
+            text = getFormattedMessage(busStops[:busLimit], setRadius)
+            imagePath = generateMap(currLoc, busStops, urlOnly)
+            if not urlOnly:
+                with open('map.png', 'rb') as file:
+                    imageData = file.read()
+                removeMapFile(imagePath)
+                imagePath = imageData
             bot.send_message(message.chat.id, text, parse_mode='HTML')
+            bot.send_photo(chat_id=message.chat.id, photo=imagePath, parse_mode='HTML')
             # print(text)
         else:
             bot.send_message(message.chat.id, 'Location not received, please enable correct permissions and try again..')

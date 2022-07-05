@@ -28,10 +28,10 @@ def loadBusStops(currLoc=None):
 from typing import List
 import yaml
 def getCurrLoc(*args):
-    if os.path.exists('secrets.yaml'):
+    if not args and os.path.exists('secrets.yaml'):
         with open('secrets.yaml', 'r') as file:
             yamlData = yaml.safe_load(file)
-        return yamlData['home']['latitude'], yamlData['home']['longitude']
+        return yamlData['home1']['latitude'], yamlData['home1']['longitude']
     else:
         if len(args) == 1 and isinstance(args[0], List) and len(args[0]) == 2:
             return tuple(args[0])
@@ -58,10 +58,11 @@ def getFormattedMessage(busStops, radius):
                 return f'{num} mins'
 
     s = f'<b>Bus Timings <i>({len(busStops)} nearby within {radius} km)</i>:</b>\n'
-    for busInfo in busStops:
+    for i, busInfo in enumerate(busStops):
         number, street, _, _, distance = busInfo.values()
         buses = getBusTimingsB(number)['buses']
-        s += f'{street}\n({number}): {distance} km\n'
+        letter = chr(ord("A")+len(busStops)-i-1)
+        s += f'{letter}: {street}\n({number}): {distance} km\n'
         if buses:
             for k,v in buses.items():
                 s += f'{k:>3}: Now - {formatNumber(v[0]):>7}, Next - {formatNumber(v[1]):>7}\n'
@@ -72,6 +73,50 @@ def getFormattedMessage(busStops, radius):
     s += f'<i>Updated on: {currentTime}</i>'
     return s
 
+import requests
+def generateMap(currLoc, busStops, urlOnly=False):
+    latitude, longitude = currLoc
+
+    pointsString = [f'[{latitude},{longitude},"255,255,255"]']
+    for i in range(len(busStops)):
+        letter = chr(ord("A")+len(busStops)-i-1)
+        pointsString += [f'[{busStops[i]["latitude"]},{busStops[i]["longitude"]},"0,0,0","{letter}"]']
+    pointsString = '|'.join(pointsString)
+
+    url = 'https://developers.onemap.sg/commonapi/staticmap/getStaticImage'
+
+    params = {
+        'layerchosen': 'original',
+        'lat': latitude,
+        'lng': longitude,
+        'zoom': '17',
+        'width': '500',
+        'height': '500',
+        'points': pointsString
+    }
+    if urlOnly:
+        return url + '?' + '&'.join([f'{k}={v}' for k,v in params.items()])
+    else:
+        print(url + '?' + '&'.join([f'{k}={v}' for k,v in params.items()]))
+        response = requests.get(url=url, params=params)
+        if response.ok:
+            imagePath = 'map.png'
+            if os.path.exists(imagePath):
+                os.remove(imagePath)
+                print(f'Removed {imagePath}')
+            with open(imagePath, 'wb') as file:
+                file.write(response.content)
+            print(f'Map successfully saved as {imagePath}')
+        else:
+            raise Exception('Bad request: Error in parameters')
+        return imagePath
+
+def removeMapFile(imagePath):
+    if os.path.exists(imagePath):
+        os.remove(imagePath)
+        print(f'Removed {imagePath}')
+    return
+
 from extract import getBusTimingsA, getBusTimingsB
 if __name__ == '__main__':
     # Constants
@@ -79,6 +124,11 @@ if __name__ == '__main__':
     busLimit = 100
 
     currLoc = getCurrLoc()
-    busStops = [i for i in loadBusStops(currLoc) if 'latitude' in i.keys() and getHaversineDistance(*currLoc, i['latitude'], i['longitude']) <= setRadius]
+    busStops = sorted([i for i in loadBusStops(currLoc) if 'latitude' in i.keys() and getHaversineDistance(*currLoc, i['latitude'], i['longitude']) <= setRadius], key=lambda x: x['distance'])[:busLimit]
     
-    print(getFormattedMessage(sorted(busStops, key=lambda x: x['distance'])[:busLimit], setRadius))
+    if 0:
+        print(getFormattedMessage(busStops[:busLimit], setRadius))
+    else:
+        imagePath = generateMap(currLoc, busStops)
+        # imagePath = generateMap(currLoc, busStops, urlOnly=True)
+        print(imagePath)
