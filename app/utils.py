@@ -28,7 +28,7 @@ def loadBusStops(currLoc=None):
 from typing import List
 import yaml
 def getCurrLoc(*args):
-    if os.path.exists('secrets.yaml'):
+    if not args and os.path.exists('secrets.yaml'):
         with open('secrets.yaml', 'r') as file:
             yamlData = yaml.safe_load(file)
         return yamlData['home1']['latitude'], yamlData['home1']['longitude']
@@ -61,7 +61,8 @@ def getFormattedMessage(busStops, radius):
     for i, busInfo in enumerate(busStops):
         number, street, _, _, distance = busInfo.values()
         buses = getBusTimingsB(number)['buses']
-        s += f'{chr(ord("A")+i)}|{street}\n({number}): {distance} km\n'
+        letter = chr(ord("A")+len(busStops)-i-1)
+        s += f'{letter}: {street}\n({number}): {distance} km\n'
         if buses:
             for k,v in buses.items():
                 s += f'{k:>3}: Now - {formatNumber(v[0]):>7}, Next - {formatNumber(v[1]):>7}\n'
@@ -78,7 +79,8 @@ def generateMap(currLoc, busStops, urlOnly=False):
 
     pointsString = [f'[{latitude},{longitude},"255,255,255"]']
     for i in range(len(busStops)):
-        pointsString += [f'[{busStops[i]["latitude"]},{busStops[i]["longitude"]},"0,0,0","{chr(ord("A")+i)}"]']
+        letter = chr(ord("A")+len(busStops)-i-1)
+        pointsString += [f'[{busStops[i]["latitude"]},{busStops[i]["longitude"]},"0,0,0","{letter}"]']
     pointsString = '|'.join(pointsString)
 
     url = 'https://developers.onemap.sg/commonapi/staticmap/getStaticImage'
@@ -95,6 +97,7 @@ def generateMap(currLoc, busStops, urlOnly=False):
     if urlOnly:
         return url + '?' + '&'.join([f'{k}={v}' for k,v in params.items()])
     else:
+        print(url + '?' + '&'.join([f'{k}={v}' for k,v in params.items()]))
         response = requests.get(url=url, params=params)
         if response.ok:
             imagePath = 'map.png'
@@ -108,6 +111,12 @@ def generateMap(currLoc, busStops, urlOnly=False):
             raise Exception('Bad request: Error in parameters')
         return imagePath
 
+def removeMapFile(imagePath):
+    if os.path.exists(imagePath):
+        os.remove(imagePath)
+        print(f'Removed {imagePath}')
+    return
+
 from extract import getBusTimingsA, getBusTimingsB
 if __name__ == '__main__':
     # Constants
@@ -115,10 +124,10 @@ if __name__ == '__main__':
     busLimit = 100
 
     currLoc = getCurrLoc()
-    busStops = [i for i in loadBusStops(currLoc) if 'latitude' in i.keys() and getHaversineDistance(*currLoc, i['latitude'], i['longitude']) <= setRadius]
+    busStops = sorted([i for i in loadBusStops(currLoc) if 'latitude' in i.keys() and getHaversineDistance(*currLoc, i['latitude'], i['longitude']) <= setRadius], key=lambda x: x['distance'])[:busLimit]
     
     if 0:
-        print(getFormattedMessage(sorted(busStops, key=lambda x: x['distance'])[:busLimit], setRadius))
+        print(getFormattedMessage(busStops[:busLimit], setRadius))
     else:
         imagePath = generateMap(currLoc, busStops)
         # imagePath = generateMap(currLoc, busStops, urlOnly=True)

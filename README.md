@@ -36,6 +36,8 @@ Commands:
     - nearest bus stops given location
     - plot on map
     - sendPhoto on Telegram
+- custom configurations
+  - radius
 
 **fix**
 
