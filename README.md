@@ -38,6 +38,9 @@ Commands:
     - sendPhoto on Telegram
 - custom configurations
   - radius
+- mrt/lrt integration
+- message tracking (pinned messages / database)
+  - disappearing message
 
 **fix**
 
