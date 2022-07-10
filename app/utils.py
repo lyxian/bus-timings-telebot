@@ -117,6 +117,14 @@ def removeMapFile(imagePath):
         print(f'Removed {imagePath}')
     return
 
+def loadConfig():
+    if os.path.exists('secrets.yaml'):
+        with open('secrets.yaml', 'r') as file:
+            yamlData = yaml.safe_load(file)
+        return yamlData
+    else:
+        return None
+
 from extract import getBusTimingsA, getBusTimingsB
 if __name__ == '__main__':
     # Constants

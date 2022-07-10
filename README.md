@@ -58,6 +58,7 @@ Commands:
 PyTelegramBotAPI
 cryptography
 pendulum
+pillow
 pyyaml
 flask
 numpy
