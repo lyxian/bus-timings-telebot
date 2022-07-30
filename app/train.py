@@ -2,9 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import os
 
-from utils import loadConfig
-
-FILES = ['train.html', 'train-1.html', 'train-2.html', 'train.png']
+FILES = ['train.html', 'train-1.html', 'train-2.html']
 
 def getCookieStr(url):
     session = requests.Session()
@@ -48,7 +46,7 @@ for file in FILES:
 
 url = 'https://trainarrivalweb.smrt.com.sg/default.aspx'
 
-cookie = getCookieStr(url) if True else loadConfig()['train']['set-cookie']
+cookie = getCookieStr(url)
 
 headers = {
     'Cookie': cookie,    # IMPT
