@@ -38,12 +38,21 @@ Commands:
     - sendPhoto on Telegram
 - custom configurations
   - radius
+- mrt/lrt integration
+- message tracking (pinned messages / database)
+  - disappearing message
 
 **fix**
 
 - methodA is 4x slower than methodB
 - sort bus error if non-numeric (ok)
 - handle no bus data
+
+# Reference
+
+- OneMap
+  - https://www.onemap.gov.sg/docs/#static-map
+  - https://tools.onemap.gov.sg/staticmap/
 
 ##Packages (list required packages & run .scripts/python-pip.sh)
 PyTelegramBotAPI
