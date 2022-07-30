@@ -47,6 +47,7 @@ Commands:
 - methodA is 4x slower than methodB
 - sort bus error if non-numeric (ok)
 - handle no bus data
+- OneMap not loading remote areas (use layers=default)
 
 # Reference
 

@@ -74,6 +74,7 @@ def getFormattedMessage(busStops, radius):
     return s
 
 import requests
+REQUEST_TIMEOUT = 25
 def generateMap(currLoc, busStops, urlOnly=False):
     latitude, longitude = currLoc
 
@@ -98,8 +99,12 @@ def generateMap(currLoc, busStops, urlOnly=False):
         return url + '?' + '&'.join([f'{k}={v}' for k,v in params.items()])
     else:
         print(url + '?' + '&'.join([f'{k}={v}' for k,v in params.items()]))
-        response = requests.get(url=url, params=params)
-        if response.ok:
+        try:
+            response = requests.get(url=url, params=params, timeout=REQUEST_TIMEOUT)
+        except:
+            print('Using layer=default..')
+            response = ''
+        if response and response.ok:
             imagePath = 'map.png'
             if os.path.exists(imagePath):
                 os.remove(imagePath)
@@ -108,7 +113,19 @@ def generateMap(currLoc, busStops, urlOnly=False):
                 file.write(response.content)
             print(f'Map successfully saved as {imagePath}')
         else:
-            raise Exception('Bad request: Error in parameters')
+            # Change map layer
+            params['layerchosen'] = 'default'
+            response = requests.get(url=url, params=params, timeout=REQUEST_TIMEOUT)
+            if response.ok:
+                imagePath = 'map.png'
+                if os.path.exists(imagePath):
+                    os.remove(imagePath)
+                    print(f'Removed {imagePath}')
+                with open(imagePath, 'wb') as file:
+                    file.write(response.content)
+                print(f'Map successfully saved as {imagePath}')
+            else:
+                raise Exception('Bad request: Error in parameters')
         return imagePath
 
 def removeMapFile(imagePath):
@@ -116,6 +133,14 @@ def removeMapFile(imagePath):
         os.remove(imagePath)
         print(f'Removed {imagePath}')
     return
+
+def loadConfig():
+    if os.path.exists('secrets.yaml'):
+        with open('secrets.yaml', 'r') as file:
+            yamlData = yaml.safe_load(file)
+        return yamlData
+    else:
+        return None
 
 from extract import getBusTimingsA, getBusTimingsB
 if __name__ == '__main__':
