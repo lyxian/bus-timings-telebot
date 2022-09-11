@@ -42,6 +42,10 @@ Commands:
 - message tracking (pinned messages / database)
   - disappearing message
 
+**extra**
+
+- integrate encryptionStore
+
 **fix**
 
 - methodA is 4x slower than methodB
