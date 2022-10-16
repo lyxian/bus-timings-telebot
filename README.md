@@ -45,6 +45,7 @@ Commands:
 **extra**
 
 - integrate encryptionStore
+- integrate route errors
 
 **fix**
 
@@ -67,4 +68,5 @@ pyyaml
 flask
 numpy
 bs4
+pytest==7.1.2
 ##Packages
